@@ -22,7 +22,7 @@ double distance(T x1,T y1,T x2, T y2)
 // **************************************************
 //for base case where the subproblem has 3 points, so calculate minimum distance manually
 template<typename T>
-std::vector<T> minDist(coord<T> pointList,int low,int high)
+std::vector<T> minDist(coord<T>& pointList,int low,int high)
 {
     //3 possible cases. either 1st and 2nd, 1st and 3rd or 1st and 2nd points
     double d12=distance(pointList[low][0],pointList[low][1],pointList[low+1][0],pointList[low+1][1]);
@@ -57,14 +57,14 @@ std::vector<T> minDist(coord<T> pointList,int low,int high)
         }
     }
     delta=x;
-    final_pair<T>.resize(4);
+    
     return final_pair<T>;
 }
 
 // **************************************************
     
 template<typename T>
-std::vector<T> closestSplitPair(coord<T> pointList, int n, int low, int mid, int high, double &delta)
+std::vector<T> closestSplitPair(coord<T>& pointList, int n, int low, int mid, int high, double &delta)
 {
     //set delta to mid or rightmost of left sub-array
     
@@ -99,13 +99,13 @@ std::vector<T> closestSplitPair(coord<T> pointList, int n, int low, int mid, int
             }
         }
     }
-    final_pair<T>.resize(4); 
+    
     return final_pair<T>;
 }
  
 // **************************************************
 template<typename T>
-std::vector<T> closestPair(coord<T> pointList,int n,int low,int high)
+std::vector<T> closestPair(coord<T>& pointList,int n,int low,int high)
 {
     //1st base: calculates and return distance minimum manually if call gets only 3 points 
     if(high-low==2)
@@ -138,18 +138,19 @@ std::vector<T> closestPair(coord<T> pointList,int n,int low,int high)
         delta=std::min(distance_left,distance_right);
     //call to check split case, where one point is in left sub-array dn other in right
     splitPoints=closestSplitPair(pointList,n,low,mid,high,delta);
-
+    double distance_split;
+    double x;
     //indicates first ever recursive call
     //coming back to this means work is done and final co-ordinates can be returned
     if((high==n-1)&&(low==0))
     {
-        final_pair<T>.resize(4);
+        
         return final_pair<T>;
     }
     else//or else return the minimum found from either left, right or combined(split) array
     {
-        double distance_split=distance(splitPoints[0],splitPoints[1],splitPoints[2],splitPoints[3]);
-        double x=std::min(std::min(distance_left,distance_right),distance_split);//minimum distance
+        distance_split=distance(splitPoints[0],splitPoints[1],splitPoints[2],splitPoints[3]);
+        x=std::min(std::min(distance_left,distance_right),distance_split);//minimum distance
         if(x==distance_split)
         {
            return splitPoints;
@@ -190,22 +191,22 @@ std::vector<T> bruteForceClosestPair(coord<T> pointlist,int n,int low,int high)
 int main()
 {
     //create a 2-D vector to store all co-ordinates 
-    std::vector<std::vector<int>> pointList{
-                                            {2, 3}, {12, 30}, {40, 50}, {5, 1}, {12, 10}, {3, 4}
-                                            };
+    // std::vector<std::vector<double>> pointList{
+    //                                         {2, 3}, {12, 30}, {40, 50}, {5, 1}, {12, 10}, {3, 4}
+    //                                         };
 
-    // std::vector<std::vector<int>> pointList;std::vector<int> a(2);
-    // for(int i=0;i<1002;i++)
-    // {
-    //     a[0]=std::rand()%1000;
-    //     a[1]=std::rand()%1000;
-    //     pointList.push_back(a);
-    // }
+    std::vector<std::vector<double>> pointList;std::vector<double> a(2);
+    for(int i=0;i<10000;i++)
+    {
+        a[0]=std::rand()%10000;
+        a[1]=std::rand()%10000;
+        pointList.push_back(a);
+    }
 
     std::sort(pointList.begin(),pointList.end());//sort the cooridiantes by their x-values
     auto start=std::chrono::steady_clock::now();
     //calls divide and conquer algorithm
-    std::vector<int> points=closestPair(pointList,pointList.size(),0,pointList.size()-1);
+    std::vector<double> points=closestPair(pointList,pointList.size(),0,pointList.size()-1);
     auto end = std::chrono::steady_clock::now();
 
     std::cout<<"\nClosest pairs using Divide and Conquer algorithm:";
